@@ -22,9 +22,11 @@ namespace SudokuGame
 
             int[,,,] board = new int[ow, oh, iw, ih];
 
-
             DrawSqaure(board);
 
+            Console.WriteLine();
+            //SmallSquare();
+            //Random();
         }
 
         static void DrawSqaure(int[,,,] board)
@@ -34,38 +36,34 @@ namespace SudokuGame
             int oh = board.GetLength(1);
             int iw = board.GetLength(2);
             int ih = board.GetLength(3);
+            string line = " " + new String('-', (oh * ih) * 4 - 1);
 
+
+            Console.WriteLine(line);
             for (int oy = 0; oy < oh; oy++) // y coords of outer block
             {
                 for (int iy = 0; iy < ih; iy++) // y coords of inner block
                 {
-                    Console.Write(" "); // after each inner y
+                    Console.Write(" | "); // after each inner y
                     for (int ox = 0; ox < ow; ox++) // x coords of outer block
                     {
 
                         for (int ix = 0; ix < iw; ix++) // x coords of inner block
                         {
-                            Console.Write($" {board[ox,oy,ix,iy]} ");
+                            board[ox, oy, ix, iy] = ix;
+                            //Console.Write($" {board[ox,oy,ix,iy]} ");
                         }
 
-                        Console.Write(" ");
+                        Console.Write(" |");
                     }
 
                     Console.WriteLine(); // end of inner line
                 }
-                //Console.WriteLine(new String('-', (oh * ih) * 4 + 1 ));
-                Console.WriteLine();
+                Console.WriteLine(line);
+                //Console.WriteLine(" ---+---+---+");
+         
             }
-
-
-
         }
-
-
-
-
-
-
 
         static int[,] SmallSquare()
         {
@@ -90,85 +88,30 @@ namespace SudokuGame
             return array;
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //int[,] numbers = new int[3, 3];
-
-        //for (int i = 0; i < numbers.GetLength(0); ++i)
-        //{
-        //    for (int j = 0; j < numbers.GetLength(1); ++j)
-        //    {
-        //        numbers[0, j] = j;
-
-        //        Console.Write($" | {numbers[0, j]} |");
-        //    }
-        //    numbers[i, 0] = i;
-
-        //    Console.WriteLine("\n");
-        //}
-
-        //Console.ReadLine();
-
-
-        static void Random()
+        static void Random(int[,,,] board)
         {
             //Console.ForegroundColor = ConsoleColor.DarkGreen;
 
-            //int[] num = new int[9];
-            //int[] prevNums = new int[20];
+            int[] num = new int[9];
 
-            //int prevNum = 10;
-            //int randNum;
-            //Random rnd = new Random();
+            int randNum;
+            Random rnd = new Random();
 
-            //Console.WriteLine(num.Length);
+            Console.WriteLine(num.Length);
 
-            //for (int i = 0; i < num.Length; i++)
-            //{
-            //    do
-            //    {
-            //        Console.Write(".");
-            //       randNum = rnd.Next(1, 10);
+            for (int i = 0; i < num.Length; i++)
+            {
+                do
+                {
+                    Console.Write(".");
+                    randNum = rnd.Next(1, 10);
 
-            //    }
-            //    while (num.Contains(randNum));
-            //    num[i] = randNum;
-            //    Console.WriteLine($"\r\nNUM {i} : {num[i]}");
+                }
+                while (num.Contains(randNum));
+                num[i] = randNum;
+                Console.WriteLine($"\r\nNUM {i} : {num[i]}");
 
-            //}
+            }
         }
     }
 }
