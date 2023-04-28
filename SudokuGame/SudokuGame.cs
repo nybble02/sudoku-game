@@ -10,10 +10,11 @@ using System.Threading.Tasks;
 
 namespace SudokuGame
 {
+    // Represents a game of sudoku
     class SudokuGame
     {
         const int BOARD_SIZE = 3;
-        Square[,,,] Board;
+        Square[,,,] Board; // The game board
         int Difficulty;
         int customClues;
         bool ShowAnswers = false;
@@ -30,7 +31,7 @@ namespace SudokuGame
             GeneratePuzzle();
         }
 
-
+        // Gives the user options for choosing difficulty
         int ChooseDifficultyOptions()
         {
             Console.WriteLine("Welcome to Sudoku!");
@@ -50,28 +51,28 @@ namespace SudokuGame
 
                 if (userInput == "1")
                 {
-                    Difficulty = 1;
+                    Difficulty = 1; // easy
                     break;
                 }
                 else if (userInput == "2")
                 {
-                    Difficulty = 2;
+                    Difficulty = 2; // medium
                     break;
                 }
                 else if (userInput == "3")
                 {
-                    Difficulty = 3;
+                    Difficulty = 3; // hard
                     break;
                 }
                 else if (userInput == "4")
                 {
-                    Difficulty = 4;
+                    Difficulty = 4; // custom difficulty
                     CustomDifficulty();
                     break;
                 }
                 else if (userInput == "5")
                 {
-                    LoadGame();
+                    LoadGame(); // import saved game
                 }
                 else
                 {
@@ -83,6 +84,7 @@ namespace SudokuGame
             return Difficulty;
         }
 
+        // Gives the user options for choosing gameplay options
         void Gameplay()
         {
 
@@ -96,8 +98,9 @@ namespace SudokuGame
                 Console.WriteLine("(3) Redo move");
                 Console.WriteLine("(4) Toggle answers");
                 Console.WriteLine("(5) Save Game");
-                Console.WriteLine("(6) Change difficulty / New game");
-                Console.WriteLine("(7) Terminate Game");
+                Console.WriteLine("(6) Complete Game");
+                Console.WriteLine("(7) Change difficulty / New game");
+                Console.WriteLine("(8) Terminate Game");
 
 
                 userChoice = Console.ReadLine();
@@ -118,7 +121,6 @@ namespace SudokuGame
                 {
                     Console.Clear();
                     ShowAnswers = !ShowAnswers;
-                    //DrawBoard();
                 }
                 else if (userChoice == "5")
                 {
@@ -126,14 +128,26 @@ namespace SudokuGame
                 }
                 else if (userChoice == "6")
                 {
-                    Console.Clear();
-                    SudokuGame game = new SudokuGame();
+                    if (isComplete())
+                    {
+                        GameComplete();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("There are still empty spaces");
+                    }
                 }
                 else if (userChoice == "7")
                 {
                     Console.Clear();
+                    SudokuGame game = new SudokuGame();
+                }
+                else if (userChoice == "8")
+                {
+                    Console.Clear();
                     Console.WriteLine("Thank you for playing!");
-                    break;
+                    Environment.Exit(0);
                 }
                 else
                 {
@@ -148,6 +162,7 @@ namespace SudokuGame
 
         }
 
+        // Allows the users to pick number of clues for custom difficulty
         void CustomDifficulty()
         {
             int minValue = 1;
@@ -159,7 +174,7 @@ namespace SudokuGame
             while (true)
             {
                 Console.WriteLine("How many clues do you want? ");
-                Console.Write($" Please enter a number between {minValue} and {maxValue} ");
+                Console.Write($" Please enter a number between {minValue} and {maxValue}: ");
                 userInput = Console.ReadLine();
 
                 isNumber = int.TryParse(userInput, out userNumber);
@@ -183,21 +198,25 @@ namespace SudokuGame
 
         }
 
+        // Allows a user to place a number on the board
         void PlaceNumber()
         {
-            int ox = 0, oy = 0, ix = 0, iy = 0;
+            // coordinates for outer square & inner square
+            int ox = 0, oy = 0, ix = 0, iy = 0; 
             string userInputRow;
             string userInputCol;
             while (true)
             {
+
+                
                 userInputCol = InputOptions(false);
                 userInputRow = InputOptions(true);
+
+                // converts the inputted values to ascii
                 char charCol = Convert.ToChar(userInputCol);
                 char charRow = Convert.ToChar(userInputRow);
-
                 int asciiCol = Convert.ToInt32(charCol);
                 int asciiRow = Convert.ToInt32(charRow);
-
                 int col = asciiCol & 15;
                 int row = asciiRow & 15;
 
@@ -245,10 +264,10 @@ namespace SudokuGame
                 }
 
 
+                // User cannot place a number in an generated occupied square
                 if (Board[ox, oy, ix, iy].IsUserField)
                 {
                     break;
-
                 }
                 else
                 {
@@ -257,11 +276,12 @@ namespace SudokuGame
                     Console.WriteLine($" Previous Choice ~ Column: {userInputCol.ToUpper()} Row: {userInputRow.ToUpper()}");
                     Console.WriteLine();
                     DrawBoard();
-
                 }
 
             }
 
+
+            // user inputs number
             int minValue = 1;
             int maxValue = 9;
             string userInput;
@@ -277,10 +297,6 @@ namespace SudokuGame
 
                 if (isNumber && userNumber >= minValue && userNumber <= maxValue)
                 {
-                    if (isComplete())
-                    {
-                        GameComplete();
-                    }
                     break;
                 }
                 else
@@ -301,20 +317,20 @@ namespace SudokuGame
                 Board[ox, oy, ix, iy].UserNum = userNumber;
                 if (UndoIndex >= 0 && UserEntries.Count != 0)
                 {
-                    UserEntries.RemoveRange(UndoIndex + 1, UserEntries.Count - (UndoIndex + 1)); // removes anything after UndoIndex rmeoves all items after the last posistion
+                    
+                    UserEntries.RemoveRange(UndoIndex + 1, UserEntries.Count - (UndoIndex + 1)); // removes all items after the last posistion
                 }
+                // store entry in user entries
                 UserEntries.Add(new UserEntry(ox, oy, ix, iy, userNumber));
                 UndoIndex = UserEntries.Count - 1;
             }
-
             Console.Clear();
-            //Gameplay();
-
         }
 
+
+        // Allows the user to undo a move
         void Undo()
         {
-            Console.WriteLine($"UndoIndex: {UndoIndex}");
             if (UndoIndex < 0)
             {
                 Console.WriteLine("There are no numbers to be undone");
@@ -326,9 +342,10 @@ namespace SudokuGame
             userEntry.isUndone = true;
 
             UndoIndex--;
-            // Gameplay();
+            Console.Clear();
         }
 
+        // Allows the user to redo a move
         void Redo()
         {
             if (UserEntries.Count < 0)
@@ -339,7 +356,7 @@ namespace SudokuGame
 
             if (UndoIndex >= UserEntries.Count - 1)
             {
-                Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAH");
+                Console.WriteLine("There are no numbers to redo");
                 return;
             }
             UndoIndex++;
@@ -347,9 +364,11 @@ namespace SudokuGame
             Board[userEntry.OuterXCoord, userEntry.OuterYCoord, userEntry.InnerXCoord, userEntry.InnerYCoord].UserNum = userEntry.UserNum;
             userEntry.isUndone = false;
 
-            //Gameplay();
+            Console.Clear();
+
         }
 
+        // Give options for the user to input cols and rows
         string InputOptions(bool isRow)
         {
 
@@ -384,7 +403,7 @@ namespace SudokuGame
             return userPlace;
         }
 
-        // Displaying the Grid
+        // Display the board
         void DrawBoard()
         {
 
@@ -433,6 +452,7 @@ namespace SudokuGame
             Console.WriteLine();
         }
 
+        // Removes numbers after generating a board
         void RemoveNumbers()
         {
 
@@ -480,12 +500,9 @@ namespace SudokuGame
 
             Console.WriteLine();
             Console.WriteLine($"Clues: {numOfClues}");
-            Console.WriteLine();
-
-
-
         }
 
+        // Initialize the board
         void InitBoard()
         {
             for (int ox = 0; ox < BOARD_SIZE; ox++) // y coords of outer block
@@ -496,7 +513,7 @@ namespace SudokuGame
                     {
                         for (int iy = 0; iy < BOARD_SIZE; iy++) // x coords of inner block
                         {
-                            Board[ox, oy, ix, iy] = new Square(ox,oy,ix,iy);
+                            Board[ox, oy, ix, iy] = new Square(ox, oy, ix, iy);
                         }
                     }
 
@@ -504,10 +521,12 @@ namespace SudokuGame
             }
         }
 
+
+        // Generates puzzle 
         void GeneratePuzzle()
         {
 
-            // top row
+            // Generates the top row first
             HashSet<int> usedNums = new HashSet<int>();
             Random random = new Random();
 
@@ -538,6 +557,7 @@ namespace SudokuGame
 
         }
 
+        // Solves the puzzle using backtracking
         bool Solve()
         {
 
@@ -627,6 +647,7 @@ namespace SudokuGame
         }
 
 
+        // Checks if the grid is fulled with numbers
         bool isComplete()
         {
             for (int ox = 0; ox < BOARD_SIZE; ox++) // y coords of outer block
@@ -650,11 +671,72 @@ namespace SudokuGame
 
         }
 
+        // When the game is complete
         void GameComplete()
         {
+            for (int ox = 0; ox < BOARD_SIZE; ox++) // y coords of outer block
+            {
+                for (int oy = 0; oy < BOARD_SIZE; oy++) // y coords of inner block
+                {
+                    for (int ix = 0; ix < BOARD_SIZE; ix++) // x coords of outer block
+                    {
+                        for (int iy = 0; iy < BOARD_SIZE; iy++) // x coords of inner block
+                        {
+                            var square = Board[ox, oy, ix, iy];
+                            
+                            if (square.IsUserField) // Correct Space
+                            {
+                                if (square.UserNum == square.GenNum)
+                                {
+                                    CorrectComplete();
 
+                                }
+                                else
+                                {
+                                    Console.Clear();
+                                    Console.WriteLine("The puzzle is incorrect. please try again");
+                                    Gameplay();
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+            }
         }
 
+        // When the game is completed and correct
+        void CorrectComplete()
+        {
+            Console.WriteLine();
+            Console.WriteLine("Congratulations! You have completed the game!");
+
+            while (true)
+            {
+                Console.WriteLine("Please pick an option to proceed");
+
+                Console.WriteLine("(1) Start a new game");
+                Console.WriteLine("(2) Terminate program");
+                string userInput = Console.ReadLine();
+
+                if (userInput == "1")
+                {
+                    Console.Clear();
+                    SudokuGame sudokuGame = new SudokuGame();
+                }
+                else if (userInput == "2") { }
+                {
+                    Console.Clear();
+                    Console.WriteLine("Program terminated! Thank you for playing");
+                    Environment.Exit(0); // exit console application
+
+                }
+
+            }
+        }
+
+
+        // Saves the board in a json file
         void SaveGame()
         {
             Console.WriteLine("Enter file name");
@@ -675,17 +757,18 @@ namespace SudokuGame
                         }
                     }
                 }
-            } 
+            }
 
 
-           // string fileName = "sudoku_saved_game.json";
-            string jsonString = JsonSerializer.Serialize(squareList, new JsonSerializerOptions { WriteIndented = true});
+            // string fileName = "sudoku_saved_game.json";
+            string jsonString = JsonSerializer.Serialize(squareList, new JsonSerializerOptions { WriteIndented = true });
 
             File.WriteAllText($"{fileName}.sudoku", jsonString);
 
 
         }
 
+        // imports board with a json file
         void LoadGame()
         {
             var fileNameList = Directory.GetFiles(".", "*.sudoku");
@@ -697,22 +780,22 @@ namespace SudokuGame
                 return;
             }
 
-            for (int i =0; i < fileNameList.Length; i++)
+            for (int i = 0; i < fileNameList.Length; i++)
             {
-              
+
                 Console.WriteLine($"{i + 1} {fileNameList[i]}");
 
             }
 
             string userFile = Console.ReadLine();
 
-            if(!int.TryParse(userFile, out int userFileNum))
+            if (!int.TryParse(userFile, out int userFileNum))
             {
                 Console.WriteLine("Input is not recognised ~ please try again");
                 return;
             }
 
-            if(userFileNum < 1 || userFileNum > fileNameList.Length)
+            if (userFileNum < 1 || userFileNum > fileNameList.Length)
             {
                 Console.WriteLine("Invalid file selected");
                 return;
@@ -724,14 +807,13 @@ namespace SudokuGame
             string jsonString = File.ReadAllText(fileNameList[userFileNum - 1]);
             squareList = JsonSerializer.Deserialize<List<Square>>(jsonString);
 
-            foreach(var square in squareList)
+            foreach (var square in squareList)
             {
                 Board[square.OuterXCoord, square.OuterYCoord, square.InnerXCoord, square.InnerYCoord] = square;
             }
 
             Gameplay();
         }
-
     }
-
 }
+
